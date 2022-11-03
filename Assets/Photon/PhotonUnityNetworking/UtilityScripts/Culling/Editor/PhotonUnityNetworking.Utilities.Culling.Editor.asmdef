@@ -1,11 +1,7 @@
 {
     "name": "PhotonUnityNetworking.Utilities.Culling.Editor",
     "references": [
-        "PhotonUnityNetworking.Utilities",
-        "UnityEditor.UI",
-        "UnityEngine.UI",
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "PhotonUnityNetworking.Utilities"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

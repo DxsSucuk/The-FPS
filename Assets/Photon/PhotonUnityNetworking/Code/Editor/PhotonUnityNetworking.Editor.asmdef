@@ -2,11 +2,7 @@
     "name": "PhotonUnityNetworking.Editor",
     "references": [
         "PhotonRealtime",
-        "PhotonUnityNetworking",
-        "UnityEditor.UI",
-        "UnityEngine.UI",
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "PhotonUnityNetworking"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [
