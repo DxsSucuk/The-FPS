@@ -1,13 +1,7 @@
-using Photon.Pun;
-
-using System.Collections;
-using System.Collections.Generic;
-
 using UnityEngine;
 
 public class PlayerCameraController : MonoBehaviour
 {
-
     PlayerCameraController cameraController;
     public Camera playerCamera;
 
@@ -24,7 +18,7 @@ public class PlayerCameraController : MonoBehaviour
     void Awake()
     {
         playerCamera = GetComponent<Camera>();
-        playerCamera.fieldOfView = playerFOV;
+        SetFov(playerFOV);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -49,5 +43,15 @@ public class PlayerCameraController : MonoBehaviour
     void Update()
     {
         CameraMovement();
+    }
+
+    public void SetFov(float fov)
+    {
+        playerCamera.fieldOfView = fov;
+    }
+
+    public void resetFov()
+    {
+        SetFov(playerFOV);
     }
 }

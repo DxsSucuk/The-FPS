@@ -1,12 +1,13 @@
 using Photon.Pun;
 
 using System.Collections;
-using System.Collections.Generic;
 
 using UnityEngine;
 
 public class PlayerMovementController : MonoBehaviourPunCallbacks
 {
+    public PlayerController _playerController;
+    
     [Header("Movement")]
     private float moveSpeed;
     public float walkSpeed;
@@ -182,6 +183,15 @@ public class PlayerMovementController : MonoBehaviourPunCallbacks
         }
 
         lastDesiredMoveSpeed = desiredMoveSpeed;
+
+        if (state == MovementState.sprinting || state == MovementState.sliding)
+        {
+            _playerController.PlayerCameraController.SetFov(130);
+        }
+        else
+        {
+            _playerController.PlayerCameraController.resetFov();
+        }
     }
 
     private IEnumerator SmoothlyLerpMoveSpeed()

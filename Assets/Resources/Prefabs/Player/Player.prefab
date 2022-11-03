@@ -478,6 +478,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61cd73d0b5afce648a40278dcf85d5cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerController: {fileID: 604839748708811991}
   walkSpeed: 7
   sprintSpeed: 13
   slideSpeed: 15

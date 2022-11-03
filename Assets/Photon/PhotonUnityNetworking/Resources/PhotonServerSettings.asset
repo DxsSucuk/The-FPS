@@ -40,6 +40,8 @@ MonoBehaviour:
   - Player_Death
   - Player_Heal
   - Weapon_Shoot
+  - CantHearYou
+  - HeresWhy
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
