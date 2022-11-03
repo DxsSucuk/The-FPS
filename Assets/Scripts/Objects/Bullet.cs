@@ -12,19 +12,16 @@ public class Bullet : MonoBehaviourPunCallbacks
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log(collision.collider.tag);
         if (collision.collider.CompareTag("Player"))
         {
             PlayerController controller = collision.gameObject.GetComponentInParent<PlayerController>();
             if (controller != null)
             {
-                Debug.Log("Found Controller");
                 GameManager gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
                 gameManager.damage(controller, damageValue);
             }
             else
             {
-                Debug.Log("No Controller");
             }
         }
         Destroy_Bullet();

@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public Slider _dashSlider;
     public Slider _healthSlider;
     public PlayerController _playerController;
+    public PlayerCameraSync _playerCameraSync;
+    public PlayerCameraController _playerCameraController;
 
     private void Awake()
     {
@@ -22,7 +24,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 _playerController = PhotonNetwork
                     .Instantiate("Prefabs/Player/Player", new Vector3(0, 1, 0), Quaternion.identity)
                     .GetComponent<PlayerController>();
-                _dashSlider.maxValue = _playerController.dashCooldown;
                 _healthSlider.maxValue = _playerController.maxHealth;
             }
         }
@@ -40,7 +41,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (_playerController != null)
         {
-            _dashSlider.maxValue = _playerController.dashCooldown;
             _healthSlider.maxValue = _playerController.maxHealth;
         }
     }
@@ -68,20 +68,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     void Check_Dash()
     {
-        float value = _dashSlider.maxValue - ((_playerController.lastDash + _playerController.dashCooldown) - Time.time);
-        if (value < _dashSlider.minValue) value = 0;
-        if (value > _playerController.dashCooldown) value = _playerController.dashCooldown;
-
-        if (value == _playerController.dashCooldown)
-        {
-            _dashSlider.gameObject.SetActive(false);
-        }
-        else
-        {
-            _dashSlider.gameObject.SetActive(true);
-        }
-
-        _dashSlider.SetValueWithoutNotify(value);
     }
 
     public void damage(PlayerController playerController, float damage)
@@ -101,10 +87,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         Debug.Log("Joined Room!");
         if (PhotonNetwork.GetPhotonView(PhotonNetwork.SyncViewId) == null)
         {
-            _playerController = PhotonNetwork
-                .Instantiate("Prefabs/Player/Player", new Vector3(0, 1, 0), Quaternion.identity)
-                .GetComponent<PlayerController>();
-            _dashSlider.maxValue = _playerController.dashCooldown;
+            GameObject player = PhotonNetwork
+                .Instantiate("Prefabs/Player/Player", new Vector3(0, 1, 0), Quaternion.identity);
+
+            _playerController = player.GetComponent<PlayerController>();
+
+            _playerCameraController.orientation = _playerController.orientation;
+            _playerController.PlayerCameraController = _playerCameraController;
+
+            _playerCameraSync.playerCamera = _playerController.cameraPosition;
+            _playerCameraSync.weaponModel = _playerController.weaponModel.transform;
+
             _healthSlider.maxValue = _playerController.maxHealth;
         }
     }

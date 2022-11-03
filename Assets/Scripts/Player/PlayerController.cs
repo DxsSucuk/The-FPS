@@ -4,46 +4,24 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviourPunCallbacks
 {
-    public float walkSpeed = 7f;
-    public float playerFOV = 120;
-    public float mouseSensitivity = 2f;
-    public float maxLookAngle = 50f;
-    public float dashSpeed = 20f;
-    public float dashCooldown = 5f;
-    public float dashTime = 0.4f;
-    public float lastDash;
     public float health = 100;
     public float maxHealth = 100;
 
     public Transform shootPoint;
+    public Transform cameraPosition;
+    public Transform orientation;
+    public GameObject weaponModel;
     public GameObject bullet;
 
-    private CharacterController characterController;
-    private Camera playerCamera;
+    public PlayerCameraController PlayerCameraController;
+
     private ParticleSystem _particleSystem;
 
-    private float yaw;
-    private float pitch;
-    private bool onGround;
     private bool canShoot = true;
-    private Vector3 velocity;
 
     void Awake()
     {
-        characterController = GetComponent<CharacterController>();
-        playerCamera = GetComponentInChildren<Camera>();
         _particleSystem = shootPoint.gameObject.GetComponentInChildren<ParticleSystem>();
-
-        if (photonView.IsMine)
-        {
-            playerCamera.fieldOfView = playerFOV;
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-        else
-        {
-            playerCamera.enabled = false;
-            playerCamera.gameObject.GetComponent<AudioListener>().enabled = false;
-        }
     }
 
     // Update is called once per frame
@@ -51,71 +29,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         if (photonView.IsMine)
         {
-            CameraMovement();
-            GroundCheck();
-            Movement();
             WeaponHandler();
         }
-    }
-
-    void GroundCheck()
-    {
-        Vector3 position = transform.position;
-        Vector3 origin = new Vector3(position.x, position.y - (transform.localScale.y * .5f),
-            position.z);
-        Vector3 direction = transform.TransformDirection(Vector3.down);
-        float distance = .75f;
-
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, distance))
-        {
-            Debug.DrawRay(origin, direction * distance, Color.red);
-            onGround = true;
-        }
-        else
-        {
-            onGround = false;
-        }
-    }
-
-    void Movement()
-    {
-        Vector3 moveVector =
-            transform.TransformDirection(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")));
-        
-        characterController.Move(moveVector * Time.deltaTime * walkSpeed);
-        
-        if (Input.GetKeyDown(KeyCode.LeftShift) && Time.time > lastDash + dashCooldown)
-        {
-            lastDash = Time.time;
-            StartCoroutine(Dash());
-        }
-
-        if (velocity.y < 0 && onGround)
-        {
-            velocity.y = 0;
-        }
-        
-        if (Input.GetKey(KeyCode.Space) && onGround && velocity.y <= 0)
-        {
-            velocity.y += Mathf.Sqrt(-2f * Physics.gravity.y);
-        }
-
-        velocity.y += Physics.gravity.y * Time.deltaTime;
-        
-        characterController.Move(velocity * Time.deltaTime);
-    }
-
-    void CameraMovement()
-    {
-        yaw = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * mouseSensitivity;
-
-        pitch -= mouseSensitivity * Input.GetAxis("Mouse Y");
-
-        // Clamp pitch between lookAngle
-        pitch = Mathf.Clamp(pitch, -maxLookAngle, maxLookAngle);
-
-        transform.localEulerAngles = new Vector3(0, yaw, 0);
-        playerCamera.transform.localEulerAngles = new Vector3(pitch, 0, 0);
     }
 
     void WeaponHandler()
@@ -137,7 +52,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
             canShoot = false;
 
-            Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            Ray ray = PlayerCameraController.playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
             RaycastHit hit;
 
             Vector3 targetPoint;
@@ -201,16 +116,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
                 Quaternion.identity);
                 transform.position += new Vector3(0, 5, 0);
                 photonView.RPC("Player_Heal", RpcTarget.All, 99999f);
-        }
-    }
-
-    IEnumerator Dash()
-    {
-        float start = Time.time;
-        while (Time.time < start + dashTime)
-        {
-            characterController.Move(transform.TransformDirection(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"))) * Time.deltaTime * dashSpeed);
-            yield return null;
         }
     }
 }
